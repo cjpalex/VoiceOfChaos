@@ -1,0 +1,82 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --gold: #c9a84c;
+  --gold-dim: #9a7a30;
+  --gold-bright: #e8c96a;
+  --red: #8b0000;
+  --red-bright: #b30000;
+  --bg: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-elevated: #1a1618;
+  --bg-card: #161214;
+  --parchment: #d4b483;
+  --parchment-dim: #a07840;
+  --text: #d4c4a0;
+  --text-dim: #7a6a50;
+  --text-bright: #f0e0b0;
+  --border: #2a2020;
+  --border-gold: #3a2c10;
+  --progress-track: #1e1a14;
+  --radius: 8px;
+  --radius-lg: 16px;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-gold);
+  border-radius: 2px;
+}
+
+/* Decorative corner motif used in multiple places */
+.corner-ornament {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: var(--gold-dim);
+  border-style: solid;
+  opacity: 0.5;
+}
+.corner-ornament.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+.corner-ornament.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+.corner-ornament.bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+.corner-ornament.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }

@@ -1,0 +1,75 @@
+.frame {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  flex-shrink: 0;
+}
+
+.outerRing {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid var(--border-gold);
+  opacity: 0.6;
+}
+
+.innerRing {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid var(--gold-dim);
+  opacity: 0.4;
+}
+
+.imageWrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--gold-dim);
+  box-shadow:
+    0 0 0 1px var(--border-gold),
+    0 0 30px rgba(139, 0, 0, 0.3),
+    0 0 60px rgba(0, 0, 0, 0.8),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.8) contrast(1.1);
+  transition: filter 0.4s ease;
+}
+
+.playing .image {
+  filter: saturate(1) contrast(1.15);
+}
+
+.pulseRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dim);
+  animation: pulse 2s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+
+.playing .outerRing {
+  animation: glow-rotate 8s linear infinite;
+  border-color: var(--gold-dim);
+  opacity: 0.8;
+}
+
+@keyframes glow-rotate {
+  0% { box-shadow: 0 0 8px var(--gold-dim); }
+  50% { box-shadow: 0 0 16px var(--gold), 0 0 32px var(--red); }
+  100% { box-shadow: 0 0 8px var(--gold-dim); }
+}

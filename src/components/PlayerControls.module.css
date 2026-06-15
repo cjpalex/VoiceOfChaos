@@ -1,0 +1,62 @@
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.skip {
+  color: var(--gold-dim);
+  padding: 10px;
+  border-radius: 50%;
+  transition: color 0.2s, transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skip:hover:not(:disabled) {
+  color: var(--gold);
+  transform: scale(1.1);
+}
+
+.skip:disabled {
+  color: var(--border);
+  cursor: default;
+}
+
+.playPause {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, var(--red-bright), var(--red));
+  border: 2px solid var(--gold-dim);
+  color: var(--gold-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(139, 0, 0, 0.5), 0 0 40px rgba(139, 0, 0, 0.2), inset 0 1px 0 rgba(201, 168, 76, 0.2);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.playPause:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 28px rgba(139, 0, 0, 0.7), 0 0 56px rgba(139, 0, 0, 0.3), inset 0 1px 0 rgba(201, 168, 76, 0.3);
+}
+
+.playPause:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.playPause:disabled {
+  opacity: 0.7;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--gold);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
