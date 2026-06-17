@@ -1,10 +1,11 @@
-import { ArtworkDisplay } from './ArtworkDisplay';
+import { ChapterCircle } from './ChapterCircle';
 import { PlayerControls } from './PlayerControls';
 import { ProgressBar } from './ProgressBar';
 import styles from './NowPlaying.module.css';
 
 export function NowPlaying({
   chapter,
+  chapterProgress,
   isPlaying,
   isLoading,
   seek,
@@ -19,9 +20,8 @@ export function NowPlaying({
 }) {
   return (
     <div className={styles.container}>
-      {/* Background texture / atmospheric layer */}
       <div className={styles.bg} />
-      <div className={styles.bgBleed} style={{ backgroundImage: chapter?.artwork ? `url(${chapter.artwork})` : 'none' }} />
+      <div className={styles.bgBleed} />
 
       <header className={styles.header}>
         <div className={styles.imperialEye}>
@@ -36,9 +36,9 @@ export function NowPlaying({
       </header>
 
       <main className={styles.main}>
-        <ArtworkDisplay
-          src={chapter?.artwork}
-          alt={chapter?.title}
+        <ChapterCircle
+          chapterNumber={chapter?.id ?? 1}
+          progress={chapterProgress}
           isPlaying={isPlaying}
         />
 

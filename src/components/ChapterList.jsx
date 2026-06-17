@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
+import { ChapterCircle } from './ChapterCircle';
 import styles from './ChapterList.module.css';
 
 function fmt(s) {
@@ -6,26 +7,6 @@ function fmt(s) {
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
   return `${m}:${sec.toString().padStart(2, '0')}`;
-}
-
-const THUMB_FALLBACK = `data:image/svg+xml,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
-  <rect width="80" height="80" fill="#0d0a0a"/>
-  <circle cx="40" cy="40" r="35" fill="none" stroke="#3a2c10" stroke-width="1"/>
-  <text x="40" y="48" text-anchor="middle" font-family="serif" font-size="28" fill="#8b0000">☩</text>
-</svg>
-`)}`;
-
-function ChapterThumb({ src, alt }) {
-  const [imgSrc, setImgSrc] = useState(src || THUMB_FALLBACK);
-  return (
-    <img
-      className={styles.thumb}
-      src={imgSrc}
-      alt={alt}
-      onError={() => setImgSrc(THUMB_FALLBACK)}
-    />
-  );
 }
 
 // Returns array of { era, chapters[] } in insertion order
@@ -38,7 +19,7 @@ function groupByEra(chapters) {
   return Array.from(map.entries()).map(([era, chapters]) => ({ era, chapters }));
 }
 
-export function ChapterList({ chapters, currentIndex, isPlaying, durations = {}, onSelect, onClose }) {
+export function ChapterList({ chapters, currentIndex, isPlaying, durations = {}, progress = {}, onSelect, onClose }) {
   const groups = useMemo(() => groupByEra(chapters), [chapters]);
 
   return (
@@ -78,7 +59,12 @@ export function ChapterList({ chapters, currentIndex, isPlaying, durations = {},
                     onClick={() => onSelect(globalIndex)}
                   >
                     <div className={styles.thumbWrapper}>
-                      <ChapterThumb src={ch.artwork} alt={ch.title} />
+                      <ChapterCircle
+                        chapterNumber={ch.id}
+                        progress={progress[ch.id] ?? 0}
+                        size="small"
+                        isPlaying={isActive && isPlaying}
+                      />
                       {isActive && isPlaying && (
                         <div className={styles.playingIndicator}>
                           <span /><span /><span />

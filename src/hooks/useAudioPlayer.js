@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Howl } from 'howler';
 
-export function useAudioPlayer(chapters) {
+export function useAudioPlayer(chapters, onChapterComplete) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [seek, setSeek] = useState(0);
@@ -12,6 +12,8 @@ export function useAudioPlayer(chapters) {
   const howlRef = useRef(null);
   const rafRef = useRef(null);
   const seekingRef = useRef(false);
+  const onCompleteRef = useRef(onChapterComplete);
+  useEffect(() => { onCompleteRef.current = onChapterComplete; }, [onChapterComplete]);
 
   const chapter = chapters[currentIndex];
 
@@ -81,6 +83,7 @@ export function useAudioPlayer(chapters) {
         onend() {
           stopRaf();
           setSeek(0);
+          onCompleteRef.current?.(ch.id);
           if (index < chapters.length - 1) {
             const next = index + 1;
             setCurrentIndex(next);
