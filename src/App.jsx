@@ -1,13 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { chapters } from './data/chapters';
 import { useAudioPlayer } from './hooks/useAudioPlayer';
 import { useListenProgress } from './hooks/useListenProgress';
 import { NowPlaying } from './components/NowPlaying';
 import { ChapterList } from './components/ChapterList';
+import { MarkModal } from './components/MarkModal';
 
 export default function App() {
   const [showList, setShowList] = useState(false);
-  const { progress, saveProgress, markComplete } = useListenProgress();
+  const [showMarkModal, setShowMarkModal] = useState(false);
+
+  const { progress, saveProgress, markComplete, resetProgress } = useListenProgress();
+
+  // First chapter that hasn't been fully listened — computed once from the stored snapshot
+  const initialIndex = useMemo(() => {
+    const idx = chapters.findIndex(ch => (progress[ch.id] ?? 0) < 100);
+    return idx === -1 ? 0 : idx;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     chapter,
@@ -22,7 +32,7 @@ export default function App() {
     prev,
     next,
     goTo,
-  } = useAudioPlayer(chapters, markComplete);
+  } = useAudioPlayer(chapters, markComplete, initialIndex);
 
   // Refs so the save-on-pause effect doesn't re-fire on every seek tick
   const seekRef = useRef(seek);
@@ -43,13 +53,23 @@ export default function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying]);
 
-  // Live fill for the current chapter; fall back to stored value when not loaded yet
+  // Live fill for the current chapter
   const liveProgress = duration > 0 ? (seek / duration) * 100 : (progress[chapter?.id] ?? 0);
   const allProgress = { ...progress, [chapter?.id]: Math.max(progress[chapter?.id] ?? 0, liveProgress) };
 
   const handleSelectChapter = (index) => {
     goTo(index);
     setShowList(false);
+  };
+
+  const handleMarkAction = (markAsListened) => {
+    if (!chapter) return;
+    if (markAsListened) {
+      markComplete(chapter.id);
+    } else {
+      resetProgress(chapter.id);
+    }
+    setShowMarkModal(false);
   };
 
   return (
@@ -68,6 +88,7 @@ export default function App() {
         onNext={next}
         onSeek={seekTo}
         onOpenList={() => setShowList(true)}
+        onCircleClick={() => setShowMarkModal(true)}
       />
 
       {showList && (
@@ -79,6 +100,15 @@ export default function App() {
           progress={allProgress}
           onSelect={handleSelectChapter}
           onClose={() => setShowList(false)}
+        />
+      )}
+
+      {showMarkModal && chapter && (
+        <MarkModal
+          chapter={chapter}
+          progress={allProgress[chapter.id] ?? 0}
+          onMark={handleMarkAction}
+          onClose={() => setShowMarkModal(false)}
         />
       )}
     </>

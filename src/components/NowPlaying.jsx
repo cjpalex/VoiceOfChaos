@@ -17,6 +17,7 @@ export function NowPlaying({
   onNext,
   onSeek,
   onOpenList,
+  onCircleClick,
 }) {
   return (
     <div className={styles.container}>
@@ -40,6 +41,7 @@ export function NowPlaying({
           chapterNumber={chapter?.id ?? 1}
           progress={chapterProgress}
           isPlaying={isPlaying}
+          onClick={onCircleClick}
         />
 
         <div className={styles.meta}>

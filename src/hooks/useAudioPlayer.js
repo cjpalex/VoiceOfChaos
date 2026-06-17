@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Howl } from 'howler';
 
-export function useAudioPlayer(chapters, onChapterComplete) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isPlaying, setIsPlaying] = useState(false);
   const [seek, setSeek] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -104,9 +104,9 @@ export function useAudioPlayer(chapters, onChapterComplete) {
     [chapters, startRaf, stopRaf, recordDuration]
   );
 
-  // Load first chapter on mount
+  // Load initial chapter on mount
   useEffect(() => {
-    loadChapter(0);
+    loadChapter(initialIndex);
     return () => {
       stopRaf();
       if (howlRef.current) howlRef.current.unload();

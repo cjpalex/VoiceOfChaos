@@ -1,21 +1,21 @@
 import { useState, useCallback } from 'react';
 
-const KEY = 'voc_progress';
+const PROGRESS_KEY = 'voc_progress';
 
-function load() {
-  try { return JSON.parse(localStorage.getItem(KEY) || '{}'); }
+function loadProgress() {
+  try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}'); }
   catch { return {}; }
 }
 
 export function useListenProgress() {
-  const [progress, setProgress] = useState(load);
+  const [progress, setProgress] = useState(loadProgress);
 
   const saveProgress = useCallback((id, percent) => {
     setProgress(prev => {
-      const clamped = Math.min(99, Math.max(0, percent)); // 99 max — only markComplete sets 100
+      const clamped = Math.min(99, Math.max(0, percent));
       if (clamped <= (prev[id] ?? 0)) return prev;
       const next = { ...prev, [id]: clamped };
-      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+      try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(next)); } catch {}
       return next;
     });
   }, []);
@@ -23,10 +23,18 @@ export function useListenProgress() {
   const markComplete = useCallback((id) => {
     setProgress(prev => {
       const next = { ...prev, [id]: 100 };
-      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+      try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(next)); } catch {}
       return next;
     });
   }, []);
 
-  return { progress, saveProgress, markComplete };
+  const resetProgress = useCallback((id) => {
+    setProgress(prev => {
+      const next = { ...prev, [id]: 0 };
+      try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  return { progress, saveProgress, markComplete, resetProgress };
 }

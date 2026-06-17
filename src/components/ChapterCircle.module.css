@@ -3,6 +3,16 @@
   flex-shrink: 0;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:active .stack {
+  opacity: 0.85;
+  transform: scale(0.97);
+  transition: transform 0.1s, opacity 0.1s;
+}
+
 .large {
   width: 220px;
   height: 220px;
