@@ -10,7 +10,7 @@ export default function App() {
   const [showList, setShowList] = useState(false);
   const [showMarkModal, setShowMarkModal] = useState(false);
 
-  const { progress, saveProgress, markComplete, resetProgress } = useListenProgress();
+  const { progress, seeks, saveProgress, saveSeek, markComplete, resetProgress } = useListenProgress();
 
   // First chapter that hasn't been fully listened — computed once from the stored snapshot
   const initialIndex = useMemo(() => {
@@ -32,7 +32,7 @@ export default function App() {
     prev,
     next,
     goTo,
-  } = useAudioPlayer(chapters, markComplete, initialIndex);
+  } = useAudioPlayer(chapters, markComplete, initialIndex, seeks);
 
   // Refs so the save-on-pause effect doesn't re-fire on every seek tick
   const seekRef = useRef(seek);
@@ -42,13 +42,16 @@ export default function App() {
   useEffect(() => { durationRef.current = duration; }, [duration]);
   useEffect(() => { chapterRef.current = chapter; }, [chapter]);
 
-  // Save progress when playback pauses
+  // Save progress and seek timestamp when playback pauses
   useEffect(() => {
     if (!isPlaying) {
       const s = seekRef.current;
       const d = durationRef.current;
       const ch = chapterRef.current;
-      if (ch && d > 0 && s > 5) saveProgress(ch.id, (s / d) * 100);
+      if (ch && d > 0 && s > 5) {
+        saveProgress(ch.id, (s / d) * 100);
+        saveSeek(ch.id, s);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying]);

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Howl } from 'howler';
 
-export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0) {
+export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, seeks = {}) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isPlaying, setIsPlaying] = useState(false);
   const [seek, setSeek] = useState(0);
@@ -13,7 +13,9 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0) {
   const rafRef = useRef(null);
   const seekingRef = useRef(false);
   const onCompleteRef = useRef(onChapterComplete);
+  const seeksRef = useRef(seeks);
   useEffect(() => { onCompleteRef.current = onChapterComplete; }, [onChapterComplete]);
+  useEffect(() => { seeksRef.current = seeks; }, [seeks]);
 
   const chapter = chapters[currentIndex];
 
@@ -42,7 +44,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0) {
   }, [stopRaf]);
 
   const loadChapter = useCallback(
-    (index, autoplay = false) => {
+    (index, autoplay = false, restoreSeek = true) => {
       stopRaf();
       if (howlRef.current) {
         howlRef.current.unload();
@@ -61,6 +63,14 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0) {
           setDuration(d);
           recordDuration(ch.id, d);
           setIsLoading(false);
+
+          // Restore saved timestamp (not on auto-advance, not if within 5s of end)
+          const savedSeek = restoreSeek ? (seeksRef.current[ch.id] ?? 0) : 0;
+          if (savedSeek > 0 && savedSeek < d - 5) {
+            howl.seek(savedSeek);
+            setSeek(savedSeek);
+          }
+
           if (autoplay) {
             howl.play();
             setIsPlaying(true);
@@ -87,7 +97,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0) {
           if (index < chapters.length - 1) {
             const next = index + 1;
             setCurrentIndex(next);
-            loadChapter(next, true);
+            loadChapter(next, true, false); // auto-advance: don't restore seek
           } else {
             setIsPlaying(false);
           }
@@ -115,7 +125,6 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0) {
   }, []);
 
   // Background metadata-only pass: fetch durations for all chapters
-  // Uses native Audio with preload="metadata" — downloads only a few KB per file
   useEffect(() => {
     const els = [];
     for (const ch of chapters) {
@@ -151,9 +160,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0) {
     seekingRef.current = true;
     howlRef.current.seek(seconds);
     setSeek(seconds);
-    setTimeout(() => {
-      seekingRef.current = false;
-    }, 100);
+    setTimeout(() => { seekingRef.current = false; }, 100);
   }, []);
 
   const goTo = useCallback(
