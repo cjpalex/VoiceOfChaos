@@ -6,7 +6,6 @@
 }
 
 .skip {
-  color: var(--gold-dim);
   padding: 10px;
   border-radius: 50%;
   transition: color 0.2s, transform 0.15s;
@@ -16,12 +15,11 @@
 }
 
 .skip:hover:not(:disabled) {
-  color: var(--gold);
   transform: scale(1.1);
 }
 
 .skip:disabled {
-  color: var(--border);
+  opacity: 0.3;
   cursor: default;
 }
 

@@ -9,7 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3}'],
-        maximumFileSizeToCacheInBytes: 200 * 1024 * 1024, // 200 MB per file
+        maximumFileSizeToCacheInBytes: 200 * 1024 * 1024,
+        skipWaiting: true,
+        clientsClaim: true,
       },
       manifest: {
         name: 'Voice of Chaos',
