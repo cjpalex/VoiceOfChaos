@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { chapters } from './data/chapters';
+import { chapters, getGroupKey } from './data/chapters';
 import { useAudioPlayer } from './hooks/useAudioPlayer';
 import { useListenProgress } from './hooks/useListenProgress';
 import { NowPlaying } from './components/NowPlaying';
@@ -56,6 +56,14 @@ export default function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying]);
 
+  // Local (group-relative) chapter number for the roman numeral display
+  const localChapterNumber = useMemo(() => {
+    if (!chapter) return 1;
+    const key = getGroupKey(chapter);
+    const groupChapters = chapters.filter(ch => getGroupKey(ch) === key);
+    return groupChapters.indexOf(chapter) + 1;
+  }, [chapter]);
+
   // Live fill for the current chapter
   const liveProgress = duration > 0 ? (seek / duration) * 100 : (progress[chapter?.id] ?? 0);
   const allProgress = { ...progress, [chapter?.id]: Math.max(progress[chapter?.id] ?? 0, liveProgress) };
@@ -79,6 +87,7 @@ export default function App() {
     <>
       <NowPlaying
         chapter={chapter}
+        localChapterNumber={localChapterNumber}
         chapterProgress={allProgress[chapter?.id] ?? 0}
         isPlaying={isPlaying}
         isLoading={isLoading}

@@ -5,6 +5,7 @@ import styles from './NowPlaying.module.css';
 
 export function NowPlaying({
   chapter,
+  localChapterNumber,
   chapterProgress,
   isPlaying,
   isLoading,
@@ -38,7 +39,7 @@ export function NowPlaying({
 
       <main className={styles.main}>
         <ChapterCircle
-          chapterNumber={chapter?.id ?? 1}
+          chapterNumber={localChapterNumber ?? 1}
           progress={chapterProgress}
           isPlaying={isPlaying}
           onClick={onCircleClick}

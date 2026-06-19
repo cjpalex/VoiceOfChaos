@@ -1,7 +1,7 @@
 import { toRoman } from '../utils/roman';
 import styles from './ChapterCircle.module.css';
 
-const FONT_BY_LENGTH = { 1: 72, 2: 64, 3: 56, 4: 50, 5: 44 };
+const FONT_BY_LENGTH = { 1: 72, 2: 64, 3: 56, 4: 50, 5: 44, 6: 38, 7: 32 };
 
 export function ChapterCircle({ chapterNumber, progress = 0, size = 'large', isPlaying = false, onClick }) {
   const fillPercent = Math.min(100, Math.max(0, progress));
