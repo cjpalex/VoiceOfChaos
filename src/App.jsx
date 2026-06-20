@@ -105,17 +105,16 @@ export default function App() {
         onCircleClick={() => setShowMarkModal(true)}
       />
 
-      {showList && (
-        <ChapterList
-          chapters={chapters}
-          currentIndex={currentIndex}
-          isPlaying={isPlaying}
-          durations={durations}
-          progress={allProgress}
-          onSelect={handleSelectChapter}
-          onClose={() => setShowList(false)}
-        />
-      )}
+      <ChapterList
+        visible={showList}
+        chapters={chapters}
+        currentIndex={currentIndex}
+        isPlaying={isPlaying}
+        durations={durations}
+        progress={allProgress}
+        onSelect={handleSelectChapter}
+        onClose={() => setShowList(false)}
+      />
 
       {showMarkModal && chapter && (
         <MarkModal

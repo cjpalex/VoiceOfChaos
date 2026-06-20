@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { getGroupKey } from '../data/chapters';
 import { ChapterCircle } from './ChapterCircle';
 import styles from './ChapterList.module.css';
@@ -121,10 +121,19 @@ function EpisodeList({ groupChapters, chapters, currentIndex, isPlaying, duratio
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function ChapterList({ chapters, currentIndex, isPlaying, durations = {}, progress = {}, onSelect, onClose }) {
+export function ChapterList({ visible = true, chapters, currentIndex, isPlaying, durations = {}, progress = {}, onSelect, onClose }) {
   const [activeGroup, setActiveGroup] = useState(null);
+  const [lastVisitedGroup, setLastVisitedGroup] = useState(null);
   const sections = useMemo(() => buildSections(chapters), [chapters]);
   const currentGroupKey = chapters[currentIndex] ? getGroupKey(chapters[currentIndex]) : null;
+  const topListRef = useRef(null);
+  const savedScrollTop = useRef(0);
+
+  useEffect(() => {
+    if (activeGroup === null && topListRef.current) {
+      topListRef.current.scrollTop = savedScrollTop.current;
+    }
+  }, [activeGroup]);
 
   const handleSelect = (index) => {
     onSelect(index);
@@ -135,10 +144,10 @@ export function ChapterList({ chapters, currentIndex, isPlaying, durations = {},
     const groupChapters = chapters.filter(ch => getGroupKey(ch) === activeGroup);
 
     return (
-      <div className={styles.overlay}>
+      <div className={styles.overlay} style={!visible ? { display: 'none' } : undefined}>
         <div className={styles.panel}>
           <header className={styles.header}>
-            <button className={styles.closeBtn} onClick={() => setActiveGroup(null)} aria-label="Back to list">
+            <button className={styles.closeBtn} onClick={() => { setLastVisitedGroup(activeGroup); setActiveGroup(null); }} aria-label="Back to list">
               {BACK_ICON}
             </button>
             <h2 className={styles.groupHeading}>{activeGroup}</h2>
@@ -176,7 +185,7 @@ export function ChapterList({ chapters, currentIndex, isPlaying, durations = {},
 
   // ── Top-level group list ────────────────────────────────────────────────────
   return (
-    <div className={styles.overlay}>
+    <div className={styles.overlay} style={!visible ? { display: 'none' } : undefined}>
       <div className={styles.panel}>
         <header className={styles.header}>
           <h2 className={styles.heading}>
@@ -191,7 +200,7 @@ export function ChapterList({ chapters, currentIndex, isPlaying, durations = {},
 
         <div className={styles.divider} />
 
-        <div className={styles.list}>
+        <div className={styles.list} ref={topListRef}>
           {sections.map(({ section, groups }) => (
             <div key={section}>
               <div className={styles.sectionHeader}>
@@ -206,8 +215,11 @@ export function ChapterList({ chapters, currentIndex, isPlaying, durations = {},
                 return (
                   <button
                     key={key}
-                    className={`${styles.groupItem} ${isCurrentGroup ? styles.groupActive : ''}`}
-                    onClick={() => setActiveGroup(key)}
+                    className={`${styles.groupItem} ${isCurrentGroup ? styles.groupActive : ''} ${key === lastVisitedGroup ? styles.groupLastVisited : ''}`}
+                    onClick={() => {
+                      savedScrollTop.current = topListRef.current?.scrollTop ?? 0;
+                      setActiveGroup(key);
+                    }}
                   >
                     <div className={styles.groupRow}>
                       <span className={styles.groupName}>{key}</span>
