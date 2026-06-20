@@ -12,6 +12,33 @@ const define = (id, section, era, title, file, tag = V3) => ({
   artwork: `/artwork/${file.replace('.mp3', '.jpg')}`,
 });
 
+export const GROUP_ARTWORK = {
+  'The Imperium':           '/artwork/imperium.jpg',
+  'Orks':                   '/artwork/orks.jpg',
+  'Eldar Craftworlders':    '/artwork/eldar.jpg',
+  'Dark Eldar':             '/artwork/dark_eldar.jpg',
+  'Necrons':                '/artwork/necron.jpg',
+  'Tyranids':               '/artwork/tyranids.jpg',
+  'Chaos Space Marines':    '/artwork/chaos_space_marine.jpg',
+  'Space Marines Loyalists':'/artwork/space_marine_loyalists.jpg',
+  'Blood Angels':           '/artwork/blood_angels.jpg',
+  'Dark Angels':            '/artwork/dark_angels.jpg',
+  'Space Wolves':           '/artwork/space_wolves.jpg',
+  'Grey Knights':           '/artwork/gre_knights.jpg',
+  'Sisters of Battle':      '/artwork/sisters_of_battle.jpg',
+  'Tau':                    '/artwork/tau.jpg',
+  'Adeptus Mechanicus':     '/artwork/adeptus.jpg',
+  'Inquisition':            '/artwork/inquisition.jpg',
+  'Astra Militarum':        '/artwork/astra_militarum.jpg',
+  'Harlequins':             '/artwork/harlequinns.jpg',
+  'Leagues of Votann':      '/artwork/leagues_votan.jpg',
+  'Genestealer Cults':      '/artwork/genestealers.jpg',
+  'Khorne':                 '/artwork/khorne.jpg',
+  'Nurgle':                 '/artwork/nurgle.jpg',
+  'Tzeentch':               '/artwork/tzeentch.jpg',
+  'Slaanesh':               '/artwork/slaanesh.jpg',
+};
+
 export function getGroupKey(ch) {
   return ch.section === 'The Imperium' ? 'The Imperium' : ch.era;
 }

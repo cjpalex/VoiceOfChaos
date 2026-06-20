@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getGroupKey } from '../data/chapters';
+import { getGroupKey, GROUP_ARTWORK } from '../data/chapters';
 import { ChapterCircle } from './ChapterCircle';
 import styles from './ChapterList.module.css';
 
@@ -215,7 +215,12 @@ export function ChapterList({ visible = true, chapters, currentIndex, isPlaying,
                 return (
                   <button
                     key={key}
-                    className={`${styles.groupItem} ${isCurrentGroup ? styles.groupActive : ''} ${key === lastVisitedGroup ? styles.groupLastVisited : ''}`}
+                    className={`${styles.groupItem} ${isCurrentGroup ? styles.groupActive : ''} ${key === lastVisitedGroup ? styles.groupLastVisited : ''} ${GROUP_ARTWORK[key] ? styles.groupHasArtwork : ''}`}
+                    style={GROUP_ARTWORK[key] ? {
+                      backgroundImage: `url(${GROUP_ARTWORK[key]})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    } : undefined}
                     onClick={() => {
                       savedScrollTop.current = topListRef.current?.scrollTop ?? 0;
                       setActiveGroup(key);
@@ -233,12 +238,12 @@ export function ChapterList({ visible = true, chapters, currentIndex, isPlaying,
                         <span className={styles.groupChevron}>{CHEVRON}</span>
                       </div>
                     </div>
-                    <div className={styles.groupProgressBar}>
-                      <div className={styles.groupProgressFill} style={{ width: `${pct}%` }} />
-                    </div>
                     {done > 0 && (
                       <span className={styles.groupDoneLabel}>{done}/{total} listened</span>
                     )}
+                    <div className={styles.groupProgressBar}>
+                      <div className={styles.groupProgressFill} style={{ width: `${pct}%` }} />
+                    </div>
                   </button>
                 );
               })}
