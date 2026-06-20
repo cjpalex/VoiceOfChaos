@@ -127,6 +127,7 @@
 
 .groupHasArtwork {
   position: relative;
+  overflow: hidden;
 }
 
 .groupHasArtwork::after {
