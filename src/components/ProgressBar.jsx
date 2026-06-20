@@ -8,8 +8,9 @@ function fmt(s) {
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
-export function ProgressBar({ seek, duration, onSeek }) {
+export function ProgressBar({ seek, duration, buffered = 0, onSeek }) {
   const barRef = useRef(null);
+  const draggingRef = useRef(false);
 
   const getPosition = useCallback(
     (clientX) => {
@@ -20,21 +21,29 @@ export function ProgressBar({ seek, duration, onSeek }) {
     [duration]
   );
 
-  const handleClick = useCallback(
+  const handlePointerDown = useCallback(
     (e) => {
       if (!duration) return;
+      e.preventDefault();
+      draggingRef.current = true;
+      barRef.current.setPointerCapture(e.pointerId);
       onSeek(getPosition(e.clientX));
     },
     [duration, getPosition, onSeek]
   );
 
-  const handleTouchStart = useCallback(
+  const handlePointerMove = useCallback(
     (e) => {
-      if (!duration) return;
-      onSeek(getPosition(e.touches[0].clientX));
+      if (!draggingRef.current || !duration) return;
+      e.preventDefault();
+      onSeek(getPosition(e.clientX));
     },
     [duration, getPosition, onSeek]
   );
+
+  const handlePointerUp = useCallback(() => {
+    draggingRef.current = false;
+  }, []);
 
   const pct = duration ? (seek / duration) * 100 : 0;
 
@@ -44,8 +53,10 @@ export function ProgressBar({ seek, duration, onSeek }) {
       <div
         className={styles.track}
         ref={barRef}
-        onClick={handleClick}
-        onTouchStart={handleTouchStart}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
         role="slider"
         aria-label="Seek"
         aria-valuemin={0}
@@ -53,6 +64,7 @@ export function ProgressBar({ seek, duration, onSeek }) {
         aria-valuenow={seek}
         tabIndex={0}
       >
+        <div className={styles.buffer} style={{ width: `${buffered}%` }} />
         <div className={styles.fill} style={{ width: `${pct}%` }} />
         <div className={styles.thumb} style={{ left: `${pct}%` }} />
       </div>

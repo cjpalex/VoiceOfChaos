@@ -7,11 +7,14 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
   const [seek, setSeek] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [buffered, setBuffered] = useState(0);
   const [durations, setDurations] = useState({});
 
   const howlRef = useRef(null);
   const rafRef = useRef(null);
   const seekingRef = useRef(false);
+  const playRequestRef = useRef(false);
+  const bufferCleanupRef = useRef(null);
   const onCompleteRef = useRef(onChapterComplete);
   const seeksRef = useRef(seeks);
   useEffect(() => { onCompleteRef.current = onChapterComplete; }, [onChapterComplete]);
@@ -46,13 +49,19 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
   const loadChapter = useCallback(
     (index, autoplay = false, restoreSeek = true) => {
       stopRaf();
+      if (bufferCleanupRef.current) {
+        bufferCleanupRef.current();
+        bufferCleanupRef.current = null;
+      }
       if (howlRef.current) {
         howlRef.current.unload();
         howlRef.current = null;
       }
       setSeek(0);
       setDuration(0);
+      setBuffered(0);
       setIsLoading(true);
+      playRequestRef.current = false;
 
       const ch = chapters[index];
       const howl = new Howl({
@@ -64,6 +73,20 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
           recordDuration(ch.id, d);
           setIsLoading(false);
 
+          // Track buffer progress via the underlying HTML5 audio node
+          const node = howl._sounds?.[0]?._node;
+          if (node) {
+            const readBuffered = () => {
+              if (node.buffered?.length > 0 && node.duration) {
+                const pct = Math.round((node.buffered.end(node.buffered.length - 1) / node.duration) * 100);
+                setBuffered(pct);
+              }
+            };
+            readBuffered();
+            node.addEventListener('progress', readBuffered);
+            bufferCleanupRef.current = () => node.removeEventListener('progress', readBuffered);
+          }
+
           // Restore saved timestamp (not on auto-advance, not if within 5s of end)
           const savedSeek = restoreSeek ? (seeksRef.current[ch.id] ?? 0) : 0;
           if (savedSeek > 0 && savedSeek < d - 5) {
@@ -73,11 +96,10 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
 
           if (autoplay) {
             howl.play();
-            setIsPlaying(true);
-            startRaf();
           }
         },
         onplay() {
+          playRequestRef.current = false;
           setIsPlaying(true);
           startRaf();
         },
@@ -147,13 +169,16 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
   }, []);
 
   const togglePlay = useCallback(() => {
-    if (!howlRef.current) return;
-    if (isPlaying) {
-      howlRef.current.pause();
-    } else {
-      howlRef.current.play();
+    const howl = howlRef.current;
+    if (!howl || isLoading) return;
+    if (howl.playing()) {
+      playRequestRef.current = false;
+      howl.pause();
+    } else if (!playRequestRef.current) {
+      playRequestRef.current = true;
+      howl.play();
     }
-  }, [isPlaying]);
+  }, [isLoading]);
 
   const seekTo = useCallback((seconds) => {
     if (!howlRef.current) return;
@@ -193,6 +218,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
     isLoading,
     seek,
     duration,
+    buffered,
     durations,
     togglePlay,
     seekTo,

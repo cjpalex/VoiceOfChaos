@@ -11,6 +11,7 @@ export function NowPlaying({
   isLoading,
   seek,
   duration,
+  buffered,
   hasPrev,
   hasNext,
   onToggle,
@@ -48,12 +49,15 @@ export function NowPlaying({
         <div className={styles.meta}>
           {chapter?.era && <p className={styles.era}>{chapter.era}</p>}
           <h2 className={styles.title}>{chapter?.title ?? 'Loading...'}</h2>
-          {chapter?.description && <p className={styles.description}>{chapter.description}</p>}
+          {isLoading
+            ? <p className={styles.buffering}>Buffering…</p>
+            : chapter?.description && <p className={styles.description}>{chapter.description}</p>
+          }
         </div>
       </main>
 
       <footer className={styles.footer}>
-        <ProgressBar seek={seek} duration={duration} onSeek={onSeek} />
+        <ProgressBar seek={seek} duration={duration} buffered={buffered} onSeek={onSeek} />
         <PlayerControls
           isPlaying={isPlaying}
           isLoading={isLoading}

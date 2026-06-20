@@ -21,6 +21,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
+  touch-action: none;
 }
 
 .track::before {
@@ -31,6 +32,15 @@
   height: 3px;
   background: var(--progress-track);
   border: 1px solid var(--border-gold);
+}
+
+.buffer {
+  position: absolute;
+  left: 0;
+  height: 3px;
+  background: rgba(180, 140, 60, 0.3);
+  pointer-events: none;
+  transition: width 0.4s ease;
 }
 
 .fill {

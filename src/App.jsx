@@ -26,6 +26,7 @@ export default function App() {
     isLoading,
     seek,
     duration,
+    buffered,
     durations,
     togglePlay,
     seekTo,
@@ -93,6 +94,7 @@ export default function App() {
         isLoading={isLoading}
         seek={seek}
         duration={duration}
+        buffered={buffered}
         hasPrev={currentIndex > 0 || seek > 3}
         hasNext={currentIndex < chapters.length - 1}
         onToggle={togglePlay}
