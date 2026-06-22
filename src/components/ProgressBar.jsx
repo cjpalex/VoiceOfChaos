@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import styles from './ProgressBar.module.css';
 
 function fmt(s) {
@@ -11,6 +11,7 @@ function fmt(s) {
 export function ProgressBar({ seek, duration, buffered = 0, onSeek }) {
   const barRef = useRef(null);
   const draggingRef = useRef(false);
+  const [dragSeek, setDragSeek] = useState(null);
 
   const getPosition = useCallback(
     (clientX) => {
@@ -27,29 +28,38 @@ export function ProgressBar({ seek, duration, buffered = 0, onSeek }) {
       e.preventDefault();
       draggingRef.current = true;
       barRef.current.setPointerCapture(e.pointerId);
-      onSeek(getPosition(e.clientX));
+      setDragSeek(getPosition(e.clientX));
     },
-    [duration, getPosition, onSeek]
+    [duration, getPosition]
   );
 
   const handlePointerMove = useCallback(
     (e) => {
       if (!draggingRef.current || !duration) return;
       e.preventDefault();
-      onSeek(getPosition(e.clientX));
+      setDragSeek(getPosition(e.clientX));
     },
-    [duration, getPosition, onSeek]
+    [duration, getPosition]
   );
 
-  const handlePointerUp = useCallback(() => {
-    draggingRef.current = false;
-  }, []);
+  const handlePointerUp = useCallback(
+    (e) => {
+      if (!draggingRef.current) return;
+      draggingRef.current = false;
+      if (dragSeek !== null) {
+        onSeek(dragSeek);
+        setDragSeek(null);
+      }
+    },
+    [dragSeek, onSeek]
+  );
 
-  const pct = duration ? Math.min(100, Math.max(0, (seek / duration) * 100)) : 0;
+  const displaySeek = dragSeek !== null ? dragSeek : seek;
+  const pct = duration ? Math.min(100, Math.max(0, (displaySeek / duration) * 100)) : 0;
 
   return (
     <div className={styles.wrapper}>
-      <span className={styles.time}>{fmt(seek)}</span>
+      <span className={styles.time}>{fmt(displaySeek)}</span>
       <div
         className={styles.track}
         ref={barRef}
@@ -61,7 +71,7 @@ export function ProgressBar({ seek, duration, buffered = 0, onSeek }) {
         aria-label="Seek"
         aria-valuemin={0}
         aria-valuemax={duration || 0}
-        aria-valuenow={seek}
+        aria-valuenow={displaySeek}
         tabIndex={0}
       >
         <div className={styles.buffer} style={{ width: `${buffered}%` }} />
