@@ -14,6 +14,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
   const rafRef = useRef(null);
   const seekingRef = useRef(false);
   const playRequestRef = useRef(false);
+  const lastSeekRef = useRef(0);
   const bufferCleanupRef = useRef(null);
   const onCompleteRef = useRef(onChapterComplete);
   const seeksRef = useRef(seeks);
@@ -39,7 +40,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
     const tick = () => {
       if (howlRef.current && !seekingRef.current) {
         const s = howlRef.current.seek();
-        if (typeof s === 'number') setSeek(s);
+        if (typeof s === 'number') { setSeek(s); lastSeekRef.current = s; }
       }
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -62,6 +63,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
       setBuffered(0);
       setIsLoading(true);
       playRequestRef.current = false;
+      lastSeekRef.current = 0;
 
       const ch = chapters[index];
       const howl = new Howl({
@@ -92,6 +94,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
           if (savedSeek > 0 && savedSeek < d - 5) {
             howl.seek(savedSeek);
             setSeek(savedSeek);
+            lastSeekRef.current = savedSeek;
           }
 
           if (autoplay) {
@@ -101,6 +104,14 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
         onplay() {
           playRequestRef.current = false;
           setIsPlaying(true);
+          // iOS can silently reset the audio position while paused (screen lock,
+          // backgrounding). Detect a >2 s drift from our last known position and
+          // seek back so playback resumes from where the user left off.
+          const currentPos = howl.seek();
+          if (typeof currentPos === 'number' && lastSeekRef.current > 5 && Math.abs(currentPos - lastSeekRef.current) > 2) {
+            howl.seek(lastSeekRef.current);
+            setSeek(lastSeekRef.current);
+          }
           startRaf();
         },
         onpause() {
@@ -185,6 +196,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
     seekingRef.current = true;
     howlRef.current.seek(seconds);
     setSeek(seconds);
+    lastSeekRef.current = seconds;
     setTimeout(() => { seekingRef.current = false; }, 100);
   }, []);
 

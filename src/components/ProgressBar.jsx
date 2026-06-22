@@ -45,7 +45,7 @@ export function ProgressBar({ seek, duration, buffered = 0, onSeek }) {
     draggingRef.current = false;
   }, []);
 
-  const pct = duration ? (seek / duration) * 100 : 0;
+  const pct = duration ? Math.min(100, Math.max(0, (seek / duration) * 100)) : 0;
 
   return (
     <div className={styles.wrapper}>
