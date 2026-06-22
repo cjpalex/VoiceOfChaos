@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { chapters, getGroupKey } from './data/chapters';
 import { useAudioPlayer } from './hooks/useAudioPlayer';
 import { useListenProgress } from './hooks/useListenProgress';
@@ -43,19 +43,28 @@ export default function App() {
   useEffect(() => { durationRef.current = duration; }, [duration]);
   useEffect(() => { chapterRef.current = chapter; }, [chapter]);
 
-  // Save progress and seek timestamp when playback pauses
-  useEffect(() => {
-    if (!isPlaying) {
-      const s = seekRef.current;
-      const d = durationRef.current;
-      const ch = chapterRef.current;
-      if (ch && d > 0 && s > 5) {
-        saveProgress(ch.id, (s / d) * 100);
-        saveSeek(ch.id, s);
-      }
+  const saveCurrentPosition = useCallback(() => {
+    const s = seekRef.current;
+    const d = durationRef.current;
+    const ch = chapterRef.current;
+    if (ch && d > 0 && s > 5) {
+      saveProgress(ch.id, (s / d) * 100);
+      saveSeek(ch.id, s);
     }
+  }, [saveProgress, saveSeek]);
+
+  // Save on pause
+  useEffect(() => {
+    if (!isPlaying) saveCurrentPosition();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying]);
+
+  // Save every 30 s while playing (covers closing the app without pausing)
+  useEffect(() => {
+    if (!isPlaying) return;
+    const id = setInterval(saveCurrentPosition, 30_000);
+    return () => clearInterval(id);
+  }, [isPlaying, saveCurrentPosition]);
 
   // Local (group-relative) chapter number for the roman numeral display
   const localChapterNumber = useMemo(() => {
