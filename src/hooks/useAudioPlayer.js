@@ -96,10 +96,6 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
             setSeek(savedSeek);
             lastSeekRef.current = savedSeek;
           }
-
-          if (autoplay) {
-            howl.play();
-          }
         },
         onplay() {
           playRequestRef.current = false;
@@ -143,6 +139,13 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
       });
 
       howlRef.current = howl;
+
+      // iOS WebKit (Chrome and Safari) requires play() to be called synchronously
+      // within a user gesture handler. Calling it here (not inside onload) keeps it
+      // in the gesture call stack; Howler queues it and fires when the audio is ready.
+      if (autoplay) {
+        howl.play();
+      }
     },
     [chapters, startRaf, stopRaf, recordDuration]
   );
