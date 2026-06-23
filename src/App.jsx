@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { chapters, getGroupKey } from './data/chapters';
+import { chapters, getGroupKey, GROUP_BG } from './data/chapters';
 import { useAudioPlayer } from './hooks/useAudioPlayer';
 import { useListenProgress } from './hooks/useListenProgress';
 import { NowPlaying } from './components/NowPlaying';
@@ -77,6 +77,7 @@ export default function App() {
   // Live fill for the current chapter
   const liveProgress = duration > 0 ? (seek / duration) * 100 : (progress[chapter?.id] ?? 0);
   const allProgress = { ...progress, [chapter?.id]: Math.max(progress[chapter?.id] ?? 0, liveProgress) };
+  const groupBg = chapter ? (GROUP_BG[getGroupKey(chapter)] ?? null) : null;
 
   const handleSelectChapter = (index) => {
     goTo(index);
@@ -97,6 +98,7 @@ export default function App() {
     <>
       <NowPlaying
         chapter={chapter}
+        groupBg={groupBg}
         localChapterNumber={localChapterNumber}
         chapterProgress={allProgress[chapter?.id] ?? 0}
         isPlaying={isPlaying}

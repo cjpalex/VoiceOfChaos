@@ -5,6 +5,7 @@ import styles from './NowPlaying.module.css';
 
 export function NowPlaying({
   chapter,
+  groupBg,
   localChapterNumber,
   chapterProgress,
   isPlaying,
@@ -24,7 +25,14 @@ export function NowPlaying({
   return (
     <div className={styles.container}>
       <div className={styles.bg} />
-      <div className={styles.bgBleed} />
+      <div
+        className={styles.bgBleed}
+        style={groupBg ? {
+          backgroundImage: `url(${groupBg})`,
+          opacity: 1,
+          filter: 'none',
+        } : undefined}
+      />
 
       <header className={styles.header}>
         <div className={styles.imperialEye}>

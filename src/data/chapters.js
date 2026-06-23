@@ -39,6 +39,14 @@ export const GROUP_ARTWORK = {
   'Slaanesh':               '/artwork/slaanesh.jpg',
 };
 
+export const GROUP_BG = {
+  'The Imperium':         '/artwork/bg_imperium.png',
+  'Orks':             '/artwork/bg_orks.png',
+  'Sisters of Battle':'/artwork/bg_battle_sisters.png',
+  'Tyranids':         '/artwork/bg_tyranids.png',
+  'Eldar Craftworlders':         '/artwork/bg_eldar.png',
+};
+
 export function getGroupKey(ch) {
   return ch.section === 'The Imperium' ? 'The Imperium' : ch.era;
 }
