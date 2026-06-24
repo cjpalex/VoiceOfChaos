@@ -38,7 +38,10 @@ export function NowPlaying({
         <div className={styles.imperialEye}>
           <span>☩</span>
         </div>
-        <h1 className={styles.appTitle}>Voice of Chaos</h1>
+        <div className={styles.titleGroup}>
+          <h1 className={styles.appTitle}>Voice of Chaos</h1>
+          <p className={styles.appVersion}>v{__APP_VERSION__}</p>
+        </div>
         <button className={styles.listBtn} onClick={onOpenList} aria-label="Chapter list">
           <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
             <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
