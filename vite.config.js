@@ -12,6 +12,17 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 200 * 1024 * 1024,
         skipWaiting: true,
         clientsClaim: true,
+        runtimeCaching: [
+          {
+            urlPattern: /^\/audio\//,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'audio-cache',
+              expiration: { maxEntries: 70, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              rangeRequests: true,
+            },
+          },
+        ],
       },
       manifest: {
         name: 'Voice of Chaos',

@@ -160,10 +160,14 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Background metadata-only pass: fetch durations for all chapters
+  // Background metadata-only pass: fetch durations for all chapters.
+  // Staggered to avoid hitting iOS's concurrent audio element limit.
   useEffect(() => {
     const els = [];
-    for (const ch of chapters) {
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i >= chapters.length) { clearInterval(timer); return; }
+      const ch = chapters[i];
       const el = new Audio();
       el.preload = 'metadata';
       el.onloadedmetadata = () => {
@@ -172,8 +176,10 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
       };
       el.src = ch.audio;
       els.push(el);
-    }
+      i++;
+    }, 500);
     return () => {
+      clearInterval(timer);
       for (const el of els) {
         el.onloadedmetadata = null;
         el.src = '';

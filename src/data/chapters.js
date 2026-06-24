@@ -1,6 +1,6 @@
-const V1 = 'https://github.com/cjpalex/VoiceOfChaos/releases/download/v1.0.0';
-const V2 = 'https://github.com/cjpalex/VoiceOfChaos/releases/download/v1.0.1';
-const V3 = 'https://github.com/cjpalex/VoiceOfChaos/releases/download/v1.0.2';
+const V1 = '/audio/v1.0.0';
+const V2 = '/audio/v1.0.1';
+const V3 = '/audio/v1.0.2';
 
 const define = (id, section, era, title, file, tag = V3) => ({
   id,
