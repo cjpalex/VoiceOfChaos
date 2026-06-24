@@ -63,7 +63,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
       setSeek(0);
       setDuration(0);
       setBuffered(0);
-      setIsLoading(true);
+      setIsLoading(autoplay); // only spinner when we're about to play
       playRequestRef.current = false;
       lastSeekRef.current = 0;
 
@@ -71,6 +71,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
       const howl = new Howl({
         src: [ch.audio],
         html5: true,
+        preload: false, // don't touch the audio element until play() is called in a gesture
         onload() {
           const d = howl.duration();
           setDuration(d);
@@ -170,6 +171,7 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
       howl.pause();
     } else if (!playRequestRef.current) {
       playRequestRef.current = true;
+      if (howl.state() !== 'loaded') setIsLoading(true);
       howl.play();
     }
   }, [isLoading]);
