@@ -45,6 +45,9 @@ export const GROUP_BG = {
   'Sisters of Battle':'/artwork/bg_battle_sisters.png',
   'Tyranids':         '/artwork/bg_tyranids.png',
   'Eldar Craftworlders':         '/artwork/bg_eldar.png',
+  'Dark Eldar':         '/artwork/bg_dark_eldar.png',
+  'Necrons':         '/artwork/bg_necron.png',
+  'Chaos Space Marines':         '/artwork/bg_chaos_marine.png',
 };
 
 export function getGroupKey(ch) {
