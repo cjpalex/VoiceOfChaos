@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
+
+Howler.html5PoolSize = 1;
 
 export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, seeks = {}) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
@@ -158,34 +160,6 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
       if (howlRef.current) howlRef.current.unload();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Background metadata-only pass: fetch durations for all chapters.
-  // Staggered to avoid hitting iOS's concurrent audio element limit.
-  useEffect(() => {
-    const els = [];
-    let i = 0;
-    const timer = setInterval(() => {
-      if (i >= chapters.length) { clearInterval(timer); return; }
-      const ch = chapters[i];
-      const el = new Audio();
-      el.preload = 'metadata';
-      el.onloadedmetadata = () => {
-        recordDuration(ch.id, el.duration);
-        el.src = '';
-      };
-      el.src = ch.audio;
-      els.push(el);
-      i++;
-    }, 500);
-    return () => {
-      clearInterval(timer);
-      for (const el of els) {
-        el.onloadedmetadata = null;
-        el.src = '';
-      }
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const togglePlay = useCallback(() => {
