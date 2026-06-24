@@ -49,6 +49,19 @@ export function NowPlaying({
         </button>
       </header>
 
+      <div className={styles.topControls}>
+        <ProgressBar seek={seek} duration={duration} buffered={buffered} onSeek={onSeek} />
+        <PlayerControls
+          isPlaying={isPlaying}
+          isLoading={isLoading}
+          onToggle={onToggle}
+          onPrev={onPrev}
+          onNext={onNext}
+          hasPrev={hasPrev}
+          hasNext={hasNext}
+        />
+      </div>
+
       <main className={styles.main}>
         <ChapterCircle
           chapterNumber={localChapterNumber ?? 1}
@@ -67,18 +80,7 @@ export function NowPlaying({
         </div>
       </main>
 
-      <footer className={styles.footer}>
-        <ProgressBar seek={seek} duration={duration} buffered={buffered} onSeek={onSeek} />
-        <PlayerControls
-          isPlaying={isPlaying}
-          isLoading={isLoading}
-          onToggle={onToggle}
-          onPrev={onPrev}
-          onNext={onNext}
-          hasPrev={hasPrev}
-          hasNext={hasNext}
-        />
-      </footer>
+      <footer className={styles.footer} />
 
       {/* Corner ornaments */}
       <div className="corner-ornament tl" />

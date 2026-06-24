@@ -1,8 +1,9 @@
 .container {
   position: relative;
-  min-height: 100svh;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   background: var(--bg);
 }
 
@@ -88,6 +89,16 @@
   color: var(--gold);
 }
 
+.topControls {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid var(--border-gold);
+}
+
 .main {
   position: relative;
   z-index: 1;
@@ -98,6 +109,7 @@
   justify-content: flex-end;
   gap: 28px;
   padding: 24px 24px 16px;
+  overflow: hidden;
 }
 
 .meta {
@@ -148,13 +160,7 @@
 }
 
 .footer {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 20px 24px 32px;
-  border-top: 1px solid var(--border-gold);
+  display: none;
 }
 
 /* ---- Landscape / larger screens ---- */
