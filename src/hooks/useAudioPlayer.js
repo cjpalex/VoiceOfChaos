@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Howl, Howler } from 'howler';
 
-Howler.html5PoolSize = 1;
+Howler.html5PoolSize = 10;
 
 export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, seeks = {}) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
