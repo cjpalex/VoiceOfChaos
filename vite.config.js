@@ -12,7 +12,17 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 200 * 1024 * 1024,
         skipWaiting: true,
         clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
+          {
+            // Always fetch fresh HTML so new JS/CSS hashes load without a hard refresh
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache',
+              networkTimeoutSeconds: 5,
+            },
+          },
           {
             urlPattern: /^\/audio\//,
             handler: 'CacheFirst',
