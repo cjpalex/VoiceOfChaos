@@ -11,9 +11,13 @@ export default async function handler(req) {
 
   const githubUrl = `https://github.com/cjpalex/VoiceOfChaos/releases/download/${version}/${file}`;
 
-  const range = req.headers.get('range');
+  // Cap each response to 2 MB so the Edge Function finishes within its 30 s
+  // execution limit. The audio element follows up with Range requests as it
+  // plays, so this is transparent to the user.
+  const incomingRange = req.headers.get('range');
+  const range = incomingRange || 'bytes=0-2097151';
   const upstream = await fetch(githubUrl, {
-    headers: range ? { range } : {},
+    headers: { range },
   });
 
   const headers = new Headers();
