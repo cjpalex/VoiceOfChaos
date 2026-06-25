@@ -46,6 +46,10 @@ export const GROUP_BG = {
   'Dark Eldar':              '/artwork/bg_dark_eldar.png',
   'Necrons':                 '/artwork/bg_necron.png',
   'Chaos Space Marines':     '/artwork/bg_chaos_marine.png',
+  'Space Marines Loyalists': '/artwork/bg_loyalists.png',
+  'Blood Angels':            '/artwork/bg_blood_angels.png',
+  'Dark Angels':             '/artwork/bg_dark_angels.png',
+  'Space Wolves':            '/artwork/bg_space_wolves.png',
 };
 
 export function getGroupKey(ch) {
