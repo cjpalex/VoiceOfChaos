@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Local audio files (hosted on Cloudflare R2)
+audios/

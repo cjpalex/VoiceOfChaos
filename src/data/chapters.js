@@ -120,11 +120,11 @@ export const chapters = [
   define(40, "Main Races", "Tyranids", "The Ultimate Threat — Can They Be Stopped?",     "40-the-ultimate-threat.mp3"),
 
   // Chaos Space Marines
-  define(41, "Main Races", "Chaos Space Marines", "The Betrayal of Horus — The Seed of Chaos",  "41-the-betrayal-of-horus.mp3"),
-  define(42, "Main Races", "Chaos Space Marines", "The Eye of Terror — Refuge of the Renegades", "42-the-eye-of-terror.mp3"),
-  define(43, "Main Races", "Chaos Space Marines", "The Legions of Chaos — The Legendary Traitors", "43-the-legions-of-chaos.mp3"),
-  define(44, "Main Races", "Chaos Space Marines", "The Champions of Chaos — Ascension and Damnation", "44-the-champions-of-chaos.mp3"),
-  define(45, "Main Races", "Chaos Space Marines", "The Black Crusades — Abaddon and His Wars",   "45-the-black-crusades.mp3"),
+  define(41, "Main Races", "Chaos Space Marines", "The Betrayal of Horus — The Seed of Chaos",       "41-chaos-the-betrayal-of-horus.mp3"),
+  define(42, "Main Races", "Chaos Space Marines", "The Eye of Terror — Refuge of the Renegades",     "42-chaos-the-eye-of-terror.mp3"),
+  define(43, "Main Races", "Chaos Space Marines", "The Legions of Chaos — The Legendary Traitors",   "43-chaos-the-legions-of-chaos.mp3"),
+  define(44, "Main Races", "Chaos Space Marines", "The Champions of Chaos — Ascension and Damnation","44-chaos-the-champions-of-chaos.mp3"),
+  define(45, "Main Races", "Chaos Space Marines", "The Black Crusades — Abaddon and His Wars",       "45-chaos-the-black-crusades.mp3"),
 
   // ── FACTIONS ──────────────────────────────────────────────────────────────
 
