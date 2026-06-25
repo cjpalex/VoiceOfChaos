@@ -17,10 +17,13 @@ export default async function handler(req) {
   });
 
   const headers = new Headers();
-  for (const key of ['content-type', 'content-length', 'content-range', 'accept-ranges', 'last-modified', 'etag']) {
+  for (const key of ['content-length', 'content-range', 'accept-ranges', 'last-modified', 'etag']) {
     const val = upstream.headers.get(key);
     if (val) headers.set(key, val);
   }
+  // GitHub CDN returns application/octet-stream for release assets — iOS audio
+  // elements reject that content-type and report MEDIA_ERR_SRC_NOT_SUPPORTED (4).
+  headers.set('content-type', 'audio/mpeg');
   headers.set('access-control-allow-origin', '*');
   headers.set('cache-control', 'public, max-age=86400');
 
