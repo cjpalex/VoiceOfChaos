@@ -1,14 +1,12 @@
-const V1 = '/audio/v1.0.0';
-const V2 = '/audio/v1.0.1';
-const V3 = '/audio/v1.0.2';
+const AUDIO_BASE = 'https://pub-109d3248dfba402f84000f8d260d3b29.r2.dev/v1.0.0';
 
-const define = (id, section, era, title, file, tag = V3) => ({
+const define = (id, section, era, title, file) => ({
   id,
   section,
   era,
   title,
   file,
-  audio: `${tag}/${file}`,
+  audio: `${AUDIO_BASE}/${file}`,
   artwork: `/artwork/${file.replace('.mp3', '.jpg')}`,
 });
 
@@ -40,14 +38,14 @@ export const GROUP_ARTWORK = {
 };
 
 export const GROUP_BG = {
-  'The Imperium':         '/artwork/bg_imperium.png',
-  'Orks':             '/artwork/bg_orks.png',
-  'Sisters of Battle':'/artwork/bg_battle_sisters.png',
-  'Tyranids':         '/artwork/bg_tyranids.png',
-  'Eldar Craftworlders':         '/artwork/bg_eldar.png',
-  'Dark Eldar':         '/artwork/bg_dark_eldar.png',
-  'Necrons':         '/artwork/bg_necron.png',
-  'Chaos Space Marines':         '/artwork/bg_chaos_marine.png',
+  'The Imperium':            '/artwork/bg_imperium.png',
+  'Orks':                    '/artwork/bg_orks.png',
+  'Sisters of Battle':       '/artwork/bg_battle_sisters.png',
+  'Tyranids':                '/artwork/bg_tyranids.png',
+  'Eldar Craftworlders':     '/artwork/bg_eldar.png',
+  'Dark Eldar':              '/artwork/bg_dark_eldar.png',
+  'Necrons':                 '/artwork/bg_necron.png',
+  'Chaos Space Marines':     '/artwork/bg_chaos_marine.png',
 };
 
 export function getGroupKey(ch) {
@@ -58,32 +56,32 @@ export const chapters = [
   // ── THE IMPERIUM ──────────────────────────────────────────────────────────
 
   // Age of Terra
-  define(1,  "The Imperium", "Age of Terra",        "Dawn of Humanity",           "01-dawn-of-humanity.mp3",           V1),
-  define(2,  "The Imperium", "Age of Terra",        "The Dark Age of Technology", "02-dark-age-of-technology.mp3",     V1),
-  define(3,  "The Imperium", "Age of Terra",        "The Age of Strife",          "03-age-of-strife.mp3",              V1),
+  define(1,  "The Imperium", "Age of Terra",        "Dawn of Humanity",           "01-dawn-of-humanity.mp3"),
+  define(2,  "The Imperium", "Age of Terra",        "The Dark Age of Technology", "02-dark-age-of-technology.mp3"),
+  define(3,  "The Imperium", "Age of Terra",        "The Age of Strife",          "03-age-of-strife.mp3"),
 
   // Rise of the Emperor
-  define(4,  "The Imperium", "Rise of the Emperor", "The Emperor Revealed",       "04-emperor-revealed.mp3",           V1),
-  define(5,  "The Imperium", "Rise of the Emperor", "The Unification Wars",       "05-unification-wars.mp3",           V2),
+  define(4,  "The Imperium", "Rise of the Emperor", "The Emperor Revealed",       "04-emperor-revealed.mp3"),
+  define(5,  "The Imperium", "Rise of the Emperor", "The Unification Wars",       "05-unification-wars.mp3"),
 
   // Great Crusade
-  define(6,  "The Imperium", "Great Crusade",       "The Primarchs: Origins",     "06-primarchs-origins.mp3",          V2),
-  define(7,  "The Imperium", "Great Crusade",       "The Legiones Astartes",      "07-legiones-astartes.mp3",          V2),
-  define(8,  "The Imperium", "Great Crusade",       "The Great Crusade",          "08-great-crusade.mp3",              V2),
-  define(9,  "The Imperium", "Great Crusade",       "Horus: The Beloved Son",     "09-horus-beloved-son.mp3",          V2),
+  define(6,  "The Imperium", "Great Crusade",       "The Primarchs: Origins",     "06-primarchs-origins.mp3"),
+  define(7,  "The Imperium", "Great Crusade",       "The Legiones Astartes",      "07-legiones-astartes.mp3"),
+  define(8,  "The Imperium", "Great Crusade",       "The Great Crusade",          "08-great-crusade.mp3"),
+  define(9,  "The Imperium", "Great Crusade",       "Horus: The Beloved Son",     "09-horus-beloved-son.mp3"),
 
   // Horus Heresy
-  define(10, "The Imperium", "Horus Heresy",        "The Seeds of Heresy",        "10-seeds-of-heresy.mp3",            V2),
-  define(11, "The Imperium", "Horus Heresy",        "The Dropsite Massacre",      "11-dropsite-massacre.mp3",          V2),
-  define(12, "The Imperium", "Horus Heresy",        "The Siege of Terra",         "12-siege-of-terra.mp3",             V2),
-  define(13, "The Imperium", "Horus Heresy",        "The Death of Horus",         "13-death-of-horus.mp3",             V2),
+  define(10, "The Imperium", "Horus Heresy",        "The Seeds of Heresy",        "10-seeds-of-heresy.mp3"),
+  define(11, "The Imperium", "Horus Heresy",        "The Dropsite Massacre",      "11-dropsite-massacre.mp3"),
+  define(12, "The Imperium", "Horus Heresy",        "The Siege of Terra",         "12-siege-of-terra.mp3"),
+  define(13, "The Imperium", "Horus Heresy",        "The Death of Horus",         "13-death-of-horus.mp3"),
 
   // Age of Imperium
-  define(14, "The Imperium", "Age of Imperium",     "The Golden Throne",          "14-golden-throne.mp3",              V2),
-  define(15, "The Imperium", "Age of Imperium",     "The Holy Inquisition",       "15-holy-inquisition.mp3",           V1),
+  define(14, "The Imperium", "Age of Imperium",     "The Golden Throne",          "14-golden-throne.mp3"),
+  define(15, "The Imperium", "Age of Imperium",     "The Holy Inquisition",       "15-holy-inquisition.mp3"),
 
   // 41st Millennium
-  define(16, "The Imperium", "41st Millennium",     "The Galaxy at War",          "16-galaxy-at-war.mp3",              V1),
+  define(16, "The Imperium", "41st Millennium",     "The Galaxy at War",          "16-galaxy-at-war.mp3"),
 
   // ── MAIN RACES ────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 {
   "name": "voiceofchaos",
   "private": true,
-  "version": "0.26.8",
+  "version": "0.27.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "howler": "^2.2.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

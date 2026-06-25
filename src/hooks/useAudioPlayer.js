@@ -1,7 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Howl, Howler } from 'howler';
-
-Howler.html5PoolSize = 10;
 
 export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, seeks = {}) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
@@ -12,14 +9,12 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
   const [buffered, setBuffered] = useState(0);
   const [durations, setDurations] = useState({});
 
-  const howlRef = useRef(null);
+  const audioRef = useRef(null);
   const rafRef = useRef(null);
   const seekingRef = useRef(false);
-  const playRequestRef = useRef(false);
-  const lastSeekRef = useRef(0);
-  const bufferCleanupRef = useRef(null);
   const onCompleteRef = useRef(onChapterComplete);
   const seeksRef = useRef(seeks);
+
   useEffect(() => { onCompleteRef.current = onChapterComplete; }, [onChapterComplete]);
   useEffect(() => { seeksRef.current = seeks; }, [seeks]);
 
@@ -27,200 +22,157 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
 
   const recordDuration = useCallback((id, secs) => {
     if (!secs || isNaN(secs)) return;
-    setDurations((prev) => (prev[id] === secs ? prev : { ...prev, [id]: secs }));
+    setDurations(prev => prev[id] === secs ? prev : { ...prev, [id]: secs });
   }, []);
 
   const stopRaf = useCallback(() => {
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
+    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
   }, []);
 
   const startRaf = useCallback(() => {
     stopRaf();
     const tick = () => {
-      if (howlRef.current && !seekingRef.current) {
-        const s = howlRef.current.seek();
-        if (typeof s === 'number') { setSeek(s); lastSeekRef.current = s; }
+      const audio = audioRef.current;
+      if (audio && !seekingRef.current) {
+        setSeek(audio.currentTime);
+        if (audio.buffered.length > 0 && audio.duration) {
+          setBuffered(Math.round(
+            (audio.buffered.end(audio.buffered.length - 1) / audio.duration) * 100
+          ));
+        }
       }
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
   }, [stopRaf]);
 
-  const loadChapter = useCallback(
-    (index, autoplay = false, restoreSeek = true) => {
+  const loadChapter = useCallback((index, autoplay = false, restoreSeek = true) => {
+    stopRaf();
+
+    const prev = audioRef.current;
+    if (prev) { prev.pause(); prev.src = ''; }
+
+    setSeek(0);
+    setDuration(0);
+    setBuffered(0);
+    setIsLoading(autoplay);
+
+    const ch = chapters[index];
+    const audio = new Audio();
+    audioRef.current = audio;
+
+    const stale = () => audioRef.current !== audio;
+
+    audio.addEventListener('loadedmetadata', () => {
+      if (stale()) return;
+      const d = audio.duration;
+      setDuration(d);
+      recordDuration(ch.id, d);
+      if (restoreSeek) {
+        const saved = seeksRef.current[ch.id] ?? 0;
+        if (saved > 0 && saved < d - 5) { audio.currentTime = saved; setSeek(saved); }
+      }
+    });
+
+    audio.addEventListener('playing', () => {
+      if (stale()) return;
+      setIsPlaying(true);
+      setIsLoading(false);
+      startRaf();
+    });
+
+    audio.addEventListener('pause', () => {
+      if (stale()) return;
+      setIsPlaying(false);
       stopRaf();
-      if (bufferCleanupRef.current) {
-        bufferCleanupRef.current();
-        bufferCleanupRef.current = null;
-      }
-      if (howlRef.current) {
-        howlRef.current.unload();
-        howlRef.current = null;
-      }
+    });
+
+    audio.addEventListener('waiting', () => {
+      if (stale()) return;
+      setIsLoading(true);
+    });
+
+    audio.addEventListener('ended', () => {
+      if (stale()) return;
+      stopRaf();
       setSeek(0);
-      setDuration(0);
-      setBuffered(0);
-      setIsLoading(autoplay); // only spinner when we're about to play
-      playRequestRef.current = false;
-      lastSeekRef.current = 0;
-
-      const ch = chapters[index];
-      const howl = new Howl({
-        src: [ch.audio],
-        html5: true,
-        preload: false, // don't touch the audio element until play() is called in a gesture
-        onload() {
-          const d = howl.duration();
-          setDuration(d);
-          recordDuration(ch.id, d);
-          setIsLoading(false);
-
-          // Track buffer progress via the underlying HTML5 audio node
-          const node = howl._sounds?.[0]?._node;
-          if (node) {
-            const readBuffered = () => {
-              if (node.buffered?.length > 0 && node.duration) {
-                const pct = Math.round((node.buffered.end(node.buffered.length - 1) / node.duration) * 100);
-                setBuffered(pct);
-              }
-            };
-            readBuffered();
-            node.addEventListener('progress', readBuffered);
-            bufferCleanupRef.current = () => node.removeEventListener('progress', readBuffered);
-          }
-
-          // Restore saved timestamp (not on auto-advance, not if within 5s of end)
-          const savedSeek = restoreSeek ? (seeksRef.current[ch.id] ?? 0) : 0;
-          if (savedSeek > 0 && savedSeek < d - 5) {
-            howl.seek(savedSeek);
-            setSeek(savedSeek);
-            lastSeekRef.current = savedSeek;
-          }
-        },
-        onplay() {
-          playRequestRef.current = false;
-          setIsPlaying(true);
-          // iOS can silently reset the audio position while paused (screen lock,
-          // backgrounding). Detect a >2 s drift from our last known position and
-          // seek back so playback resumes from where the user left off.
-          const currentPos = howl.seek();
-          if (typeof currentPos === 'number' && lastSeekRef.current > 5 && Math.abs(currentPos - lastSeekRef.current) > 2) {
-            howl.seek(lastSeekRef.current);
-            setSeek(lastSeekRef.current);
-          }
-          startRaf();
-        },
-        onpause() {
-          setIsPlaying(false);
-          stopRaf();
-        },
-        onstop() {
-          setIsPlaying(false);
-          stopRaf();
-          setSeek(0);
-        },
-        onend() {
-          stopRaf();
-          setSeek(0);
-          onCompleteRef.current?.(ch.id);
-          if (index < chapters.length - 1) {
-            const next = index + 1;
-            setCurrentIndex(next);
-            loadChapter(next, true, false); // auto-advance: don't restore seek
-          } else {
-            setIsPlaying(false);
-          }
-        },
-        onloaderror(id, err) {
-          console.warn('Audio load error:', err);
-          setIsLoading(false);
-          setIsPlaying(false);
-        },
-      });
-
-      howlRef.current = howl;
-
-      // iOS WebKit (Chrome and Safari) requires play() to be called synchronously
-      // within a user gesture handler. Calling it here (not inside onload) keeps it
-      // in the gesture call stack; Howler queues it and fires when the audio is ready.
-      if (autoplay) {
-        howl.play();
+      setIsPlaying(false);
+      onCompleteRef.current?.(ch.id);
+      if (index < chapters.length - 1) {
+        const next = index + 1;
+        setCurrentIndex(next);
+        loadChapter(next, true, false);
       }
-    },
-    [chapters, startRaf, stopRaf, recordDuration]
-  );
+    });
 
-  // Load initial chapter on mount
+    audio.addEventListener('error', () => {
+      if (stale()) return;
+      console.warn('Audio error:', audio.error?.code, audio.error?.message);
+      setIsLoading(false);
+      setIsPlaying(false);
+    });
+
+    audio.preload = 'none';
+    audio.src = ch.audio;
+
+    if (autoplay) {
+      audio.play().catch(err => {
+        if (stale()) return;
+        console.warn('Play failed:', err);
+        setIsPlaying(false);
+        setIsLoading(false);
+      });
+    }
+  }, [chapters, startRaf, stopRaf, recordDuration]);
+
   useEffect(() => {
     loadChapter(initialIndex);
     return () => {
       stopRaf();
-      if (howlRef.current) howlRef.current.unload();
+      const audio = audioRef.current;
+      if (audio) { audio.pause(); audio.src = ''; audioRef.current = null; }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const togglePlay = useCallback(() => {
-    const howl = howlRef.current;
-    if (!howl || isLoading) return;
-    if (howl.playing()) {
-      playRequestRef.current = false;
-      howl.pause();
-    } else if (!playRequestRef.current) {
-      playRequestRef.current = true;
-      if (howl.state() !== 'loaded') setIsLoading(true);
-      howl.play();
+    const audio = audioRef.current;
+    if (!audio || isLoading) return;
+    if (!audio.paused) {
+      audio.pause();
+    } else {
+      if (audio.readyState < 3) setIsLoading(true);
+      audio.play().catch(err => {
+        console.warn('Play failed:', err);
+        setIsPlaying(false);
+        setIsLoading(false);
+      });
     }
   }, [isLoading]);
 
   const seekTo = useCallback((seconds) => {
-    if (!howlRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
     seekingRef.current = true;
-    howlRef.current.seek(seconds);
+    audio.currentTime = seconds;
     setSeek(seconds);
-    lastSeekRef.current = seconds;
     setTimeout(() => { seekingRef.current = false; }, 100);
   }, []);
 
-  const goTo = useCallback(
-    (index) => {
-      const playing = isPlaying;
-      setCurrentIndex(index);
-      loadChapter(index, playing);
-    },
-    [isPlaying, loadChapter]
-  );
+  const goTo = useCallback((index) => {
+    const playing = audioRef.current ? !audioRef.current.paused : false;
+    setCurrentIndex(index);
+    loadChapter(index, playing);
+  }, [loadChapter]);
 
   const prev = useCallback(() => {
-    if (seek > 3 && howlRef.current) {
-      seekTo(0);
-    } else if (currentIndex > 0) {
-      goTo(currentIndex - 1);
-    }
+    if (seek > 3) { seekTo(0); }
+    else if (currentIndex > 0) { goTo(currentIndex - 1); }
   }, [currentIndex, seek, goTo, seekTo]);
 
   const next = useCallback(() => {
-    if (currentIndex < chapters.length - 1) {
-      goTo(currentIndex + 1);
-    }
+    if (currentIndex < chapters.length - 1) { goTo(currentIndex + 1); }
   }, [currentIndex, chapters.length, goTo]);
 
-  return {
-    chapter,
-    currentIndex,
-    isPlaying,
-    isLoading,
-    seek,
-    duration,
-    buffered,
-    durations,
-    togglePlay,
-    seekTo,
-    prev,
-    next,
-    goTo,
-  };
+  return { chapter, currentIndex, isPlaying, isLoading, seek, duration, buffered, durations, togglePlay, seekTo, prev, next, goTo };
 }
