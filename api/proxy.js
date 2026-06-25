@@ -1,14 +1,15 @@
 export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
-  const { pathname } = new URL(req.url);
-  const filePath = pathname.replace('/api/audio/', '');
+  const url = new URL(req.url);
+  const version = url.searchParams.get('version');
+  const file = url.searchParams.get('file');
 
-  if (!filePath || !/^v[\d.]+\/.+\.mp3$/i.test(filePath)) {
+  if (!version || !file || !/^v[\d.]+$/.test(version) || !/\.mp3$/i.test(file)) {
     return new Response('Not found', { status: 404 });
   }
 
-  const githubUrl = `https://github.com/cjpalex/VoiceOfChaos/releases/download/${filePath}`;
+  const githubUrl = `https://github.com/cjpalex/VoiceOfChaos/releases/download/${version}/${file}`;
 
   const range = req.headers.get('range');
   const upstream = await fetch(githubUrl, {

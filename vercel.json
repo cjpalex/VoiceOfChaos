@@ -1,1 +1,8 @@
-{}
+{
+  "rewrites": [
+    {
+      "source": "/audio/:version/:file",
+      "destination": "/api/proxy?version=:version&file=:file"
+    }
+  ]
+}
