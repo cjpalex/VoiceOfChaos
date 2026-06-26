@@ -50,6 +50,10 @@ export const GROUP_BG = {
   'Blood Angels':            '/artwork/bg_blood_angels.png',
   'Dark Angels':             '/artwork/bg_dark_angels.png',
   'Space Wolves':            '/artwork/bg_space_wolves.png',
+  'Tau':                     '/artwork/bg_tau.png',
+  'Adeptus Mechanicus':      '/artwork/bg_adeptus_mechanicus.png',
+  'Inquisition':             '/artwork/bg_inquisition.png',
+  'Astra Militarum':         '/artwork/bg_astra_militarum.png',
 };
 
 export function getGroupKey(ch) {
@@ -133,11 +137,11 @@ export const chapters = [
   // ── FACTIONS ──────────────────────────────────────────────────────────────
 
   define(46, "Factions", "Space Marines Loyalists", "Sons of the Emperor",             "46-space-marines-loyalists.mp3"),
-  define(47, "Factions", "Blood Angels",            "The Blood Thirst and the Black Rage", "47-blood-angels.mp3"),
-  define(48, "Factions", "Dark Angels",             "The Impenetrable Secret",         "48-dark-angels.mp3"),
-  define(49, "Factions", "Space Wolves",            "The Wolves of Fenris",            "49-space-wolves.mp3"),
-  define(50, "Factions", "Grey Knights",            "The Guardians Against the Daemon","50-grey-knights.mp3"),
-  define(51, "Factions", "Sisters of Battle",       "Faith as Armor",                  "51-sisters-of-battle.mp3"),
+  define(47, "Factions", "Blood Angels",            "The Blood Thirst and the Black Rage", "47-blood_angels.mp3"),
+  define(48, "Factions", "Dark Angels",             "The Impenetrable Secret",         "48-dark_angels.mp3"),
+  define(49, "Factions", "Space Wolves",            "The Wolves of Fenris",            "49-space_wolves.mp3"),
+  define(50, "Factions", "Grey Knights",            "The Guardians Against the Daemon","50-gray_knights.mp3"),
+  define(51, "Factions", "Sisters of Battle",       "Faith as Armor",                  "51-battle_sisters.mp3"),
   define(52, "Factions", "Tau",                     "The Empire of the Greater Good",  "52-tau.mp3"),
   define(53, "Factions", "Adeptus Mechanicus",      "The Cult of the Machine",         "53-adeptus-mechanicus.mp3"),
   define(54, "Factions", "Inquisition",             "Nobody Expects the Inquisition",  "54-inquisition.mp3"),
