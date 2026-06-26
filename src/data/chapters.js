@@ -136,7 +136,7 @@ export const chapters = [
 
   // ── FACTIONS ──────────────────────────────────────────────────────────────
 
-  define(46, "Factions", "Space Marines Loyalists", "Sons of the Emperor",             "46-space_marines_loyalists.mp3"),
+  define(46, "Factions", "Space Marines Loyalists", "Sons of the Emperor",             "46-space_marine_loyalist.mp3"),
   define(47, "Factions", "Blood Angels",            "The Blood Thirst and the Black Rage", "47-blood_angels.mp3"),
   define(48, "Factions", "Dark Angels",             "The Impenetrable Secret",         "48-dark_angels.mp3"),
   define(49, "Factions", "Space Wolves",            "The Wolves of Fenris",            "49-space_wolves.mp3"),
