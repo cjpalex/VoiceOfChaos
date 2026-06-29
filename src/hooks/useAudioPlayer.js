@@ -10,7 +10,9 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
   const [durations, setDurations] = useState({});
 
   const audioRef = useRef(null);
+  const abortRef = useRef(null);
   const rafRef = useRef(null);
+  const genRef = useRef(0);
   const seekingRef = useRef(false);
   const onCompleteRef = useRef(onChapterComplete);
   const seeksRef = useRef(seeks);
@@ -49,8 +51,17 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
   const loadChapter = useCallback((index, autoplay = false, restoreSeek = true) => {
     stopRaf();
 
-    const prev = audioRef.current;
-    if (prev) { prev.pause(); prev.src = ''; }
+    // Remove all listeners from the previous chapter load
+    if (abortRef.current) { abortRef.current.abort(); }
+    abortRef.current = new AbortController();
+    const { signal } = abortRef.current;
+
+    // Reuse the same audio element to preserve the browser's autoplay activation context
+    const audio = audioRef.current;
+    audio.pause();
+
+    const gen = ++genRef.current;
+    const stale = () => genRef.current !== gen;
 
     setSeek(0);
     setDuration(0);
@@ -58,10 +69,6 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
     setIsLoading(autoplay);
 
     const ch = chapters[index];
-    const audio = new Audio();
-    audioRef.current = audio;
-
-    const stale = () => audioRef.current !== audio;
 
     audio.addEventListener('loadedmetadata', () => {
       if (stale()) return;
@@ -72,25 +79,25 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
         const saved = seeksRef.current[ch.id] ?? 0;
         if (saved > 0 && saved < d - 5) { audio.currentTime = saved; setSeek(saved); }
       }
-    });
+    }, { signal });
 
     audio.addEventListener('playing', () => {
       if (stale()) return;
       setIsPlaying(true);
       setIsLoading(false);
       startRaf();
-    });
+    }, { signal });
 
     audio.addEventListener('pause', () => {
       if (stale()) return;
       setIsPlaying(false);
       stopRaf();
-    });
+    }, { signal });
 
     audio.addEventListener('waiting', () => {
       if (stale()) return;
       setIsLoading(true);
-    });
+    }, { signal });
 
     audio.addEventListener('ended', () => {
       if (stale()) return;
@@ -103,14 +110,14 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
         setCurrentIndex(next);
         loadChapter(next, true, false);
       }
-    });
+    }, { signal });
 
     audio.addEventListener('error', () => {
       if (stale()) return;
       console.warn('Audio error:', audio.error?.code, audio.error?.message);
       setIsLoading(false);
       setIsPlaying(false);
-    });
+    }, { signal });
 
     audio.preload = 'none';
     audio.src = ch.audio;
@@ -126,9 +133,11 @@ export function useAudioPlayer(chapters, onChapterComplete, initialIndex = 0, se
   }, [chapters, startRaf, stopRaf, recordDuration]);
 
   useEffect(() => {
+    audioRef.current = new Audio();
     loadChapter(initialIndex);
     return () => {
       stopRaf();
+      if (abortRef.current) { abortRef.current.abort(); }
       const audio = audioRef.current;
       if (audio) { audio.pause(); audio.src = ''; audioRef.current = null; }
     };
