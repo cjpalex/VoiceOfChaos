@@ -54,6 +54,10 @@ export const GROUP_BG = {
   'Adeptus Mechanicus':      '/artwork/bg_adeptus_mechanicus.png',
   'Inquisition':             '/artwork/bg_inquisition.png',
   'Astra Militarum':         '/artwork/bg_astra_militarum.png',
+  'Harlequins':              '/artwork/bg_harlequinns.png',
+  'Leagues of Votann':       '/artwork/bg_votann.png',
+  'Genestealer Cults':       '/artwork/bg_gene_stealers.png',
+  'Khorne':                  '/artwork/bg_khorne.png',
 };
 
 export function getGroupKey(ch) {
